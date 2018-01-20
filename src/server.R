@@ -82,6 +82,11 @@ server <- function(input, output) {
   output$prop_sightings <- renderPlot({
     
     sightings() %>% 
+      mutate(date=year(date)) %>% 
+      group_by(date, shape) %>%
+      ggplot(aes(x=date, fill=shape)) + 
+      geom_bar(position = "fill") + 
+      scale_fill_manual(values = col_pal)
     
   })
   

@@ -36,9 +36,8 @@ ui <- fluidPage(
       
       fluidRow(
         
-        column(6,
-               plotOutput("total_sightings")
-        )
+        column(6, plotOutput("total_sightings")),
+        column(6, plotOutput("prop_sightings"))
         
       )
       
