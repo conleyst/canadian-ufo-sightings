@@ -86,7 +86,9 @@ server <- function(input, output) {
       group_by(date, shape) %>%
       ggplot(aes(x=date, fill=shape)) + 
       geom_bar(position = "fill") + 
-      scale_fill_manual(values = col_pal)
+      scale_fill_manual(values = col_pal) + 
+      theme_minimal() + 
+      labs(title="Proportions of Shapes Seen By Years", x="Years", y="Proportions")
     
   })
   
