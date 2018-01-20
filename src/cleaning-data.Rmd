@@ -1,0 +1,78 @@
+---
+title: "cleaning-ufo-data"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r message=FALSE}
+library(tidyverse)
+library(lubridate)
+library(stringr)
+```
+
+```{r warning=FALSE}
+ufo <- read_csv("../data/ufo.csv")
+
+ufo_clean <- ufo %>% 
+  filter(country=="ca") %>% 
+  mutate(date = mdy_hm(datetime)) %>%
+  mutate(date = as.Date(date)) %>% 
+  # mutate(
+  #   year = year(datetime),
+  #   month = month(datetime),
+  #   day = day(datetime),
+  #   hr = hour(datetime),
+  #   min = minute(datetime)
+  #   ) %>% 
+  mutate(
+    province = state,
+    duration = `duration (seconds)`
+    ) %>% 
+  select(-c(state, comments, datetime, `duration (hours/min)`, `duration (seconds)`, `date posted`, country)) %>% 
+  mutate(province = str_to_upper(province)) %>%
+  mutate(
+    city=str_extract(city, "^.*?(?=\\()"),
+    city=trimws(city, "right"),
+    city=ifelse(city=="st. john&#39s", "st. john's", city),
+    city=str_to_title(city)
+    )
+
+# cleaning the shapes
+ufo_clean <- ufo_clean %>% 
+  mutate(shape=str_to_title(shape)) %>% 
+  mutate(
+    shape=ifelse(is.na(shape), "Unknown", shape),
+    shape=ifelse(shape=="Delta", "Triangle", shape),
+    shape=ifelse(shape=="Circle", "Circular", shape),
+    shape=ifelse(shape=="Oval", "Circular", shape),
+    shape=ifelse(shape=="Cylinder", "Cylindrical", shape),
+    shape=ifelse(shape=="Cigar", "Cylindrical", shape),
+    shape=ifelse(shape=="Flash", "Light", shape),
+    shape=ifelse(shape=="Sphere", "Spherical", shape),
+    shape=ifelse(shape=="Egg", "Spherical", shape),
+    shape=ifelse(shape=="Rectangle", "Square/Rectangular", shape),
+    shape=ifelse(shape=="Diamond", "Square/Rectangular", shape),
+    shape=ifelse(shape=="Cross", "Other", shape),
+    shape=ifelse(shape=="Cone", "Other", shape),
+    shape=ifelse(shape=="Teardrop", "Other", shape),
+    shape=ifelse(shape=="Chevron", "Triangular", shape),
+    shape=ifelse(shape=="Triangle", "Triangular", shape),
+    shape=ifelse(shape=="Circular", "Disk/Circle", shape),
+    shape=ifelse(shape=="Disk", "Disk/Circle", shape),
+    shape=ifelse(shape=="Changing", "Other", shape)
+    )
+
+# adding jittered coordinates so that markers don't overlap on the map
+ufo_clean <- ufo_clean %>% 
+      mutate(
+        disp_lat = jitter(latitude, factor=20),
+        disp_long = jitter(longitude, factor=20)
+        )
+
+write_csv(ufo_clean, "../data/ufo_clean.csv")
+```
+
+
