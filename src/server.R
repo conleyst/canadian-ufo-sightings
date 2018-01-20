@@ -79,6 +79,12 @@ server <- function(input, output) {
   })
   
   
+  output$prop_sightings <- renderPlot({
+    
+    sightings() %>% 
+    
+  })
+  
   output$total_sightings <- renderPlot({
 
     sightings() %>% 
@@ -86,7 +92,7 @@ server <- function(input, output) {
       group_by(date, shape) %>%
       summarise(count = n()) %>% 
       ggplot(aes(x = date, y=count, colour=shape)) + 
-      geom_line() + 
+      geom_line(size=1) + 
       scale_colour_manual(values = col_pal) + #scale_color_brewer(palette="Set3") + 
       theme_minimal() + 
       labs(title="Number of Reports in Defined Area Over Time", x="Years", y="Frequency")
