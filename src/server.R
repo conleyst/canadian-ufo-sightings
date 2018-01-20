@@ -53,7 +53,7 @@ server <- function(input, output) {
         "bottomright",
         pal = colour_palette,
         values = c("Spherical", "Cylindrical", "Light", "Disk/Circle", "Square/Rectangular", "Fireball", "Triangular", "Formation", "Unknown", "Other"),
-        title = "Shapes Reported",
+        title = "Shape Reported",
         opacity = 1)
     
   })  
