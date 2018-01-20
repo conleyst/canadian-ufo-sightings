@@ -88,7 +88,8 @@ server <- function(input, output) {
       geom_bar(position = "fill") + 
       scale_fill_manual(values = col_pal) + 
       theme_minimal() + 
-      labs(title="Proportions of Shapes Seen By Years", x="Years", y="Proportions")
+      guides(fill=FALSE) + 
+      labs(title="Proportions of Shapes Seen By Year", x="Years", y="Proportions")
     
   })
   
@@ -99,10 +100,11 @@ server <- function(input, output) {
       group_by(date, shape) %>%
       summarise(count = n()) %>% 
       ggplot(aes(x = date, y=count, colour=shape)) + 
-      geom_line(size=1) + 
-      scale_colour_manual(values = col_pal) + #scale_color_brewer(palette="Set3") + 
+      geom_line(size=2) + 
+      scale_colour_manual(values = col_pal) + 
       theme_minimal() + 
-      labs(title="Number of Reports in Defined Area Over Time", x="Years", y="Frequency")
+      guides(colour=FALSE) + 
+      labs(title="Number of Reports in Defined Area By Year", x="Years", y="Frequency")
   
   })
   
