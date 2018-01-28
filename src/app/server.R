@@ -4,6 +4,7 @@ library(tidyverse)
 library(lubridate)
 library(htmltools)
 library(RColorBrewer)
+library(plotly)
 
 # import previously cleaned data
 ufo <- read_csv("data/ufo_clean.csv")
@@ -25,6 +26,7 @@ names(col_pal) <- tmp$shape
 
 server <- function(input, output) {
   
+  # create the reactive long/lat box that will update based on sliders
   sightings <- reactive({
     ufo %>% 
       filter(
@@ -42,6 +44,7 @@ server <- function(input, output) {
   
   output$ufosightings <- renderLeaflet({
     
+    # create the base map
     leaflet() %>% 
       addTiles() %>% 
       addRectangles(
@@ -61,6 +64,7 @@ server <- function(input, output) {
   
   observe({
     
+    # code to have markers render based on input
     leafletProxy("ufosightings", data = sightings()) %>%
       clearMarkers() %>% 
       addCircleMarkers(
@@ -79,34 +83,34 @@ server <- function(input, output) {
   })
   
   
-  output$prop_sightings <- renderPlot({
+  output$sightings <- renderPlotly({
     
-    sightings() %>% 
-      mutate(date=year(date)) %>% 
+    # plot of proportion of shapes seen by year
+    p1 <- sightings() %>%
+      mutate(date=year(date)) %>%
       group_by(date, shape) %>%
-      ggplot(aes(x=date, fill=shape)) + 
-      geom_bar(position = "fill") + 
-      scale_fill_manual(values = col_pal) + 
-      theme_minimal() + 
-      guides(fill=FALSE) + 
-      labs(title="Proportions of Shapes Seen By Year", x="Years", y="Proportions")
-    
-  })
-  
-  output$total_sightings <- renderPlot({
+      ggplot(aes(x=date, fill=shape)) +
+      geom_bar(position = "fill") +
+      scale_fill_manual(values = col_pal) +
+      theme_minimal() +
+      guides(fill=FALSE) +
+      labs(title="Total and Proportion of Shapes By Year", x="Years")
 
-    sightings() %>% 
-      mutate(date=year(date)) %>% 
+    # plot of total shapes seen by year
+    p2 <- sightings() %>%
+      mutate(date=year(date)) %>%
       group_by(date, shape) %>%
-      summarise(count = n()) %>% 
-      ggplot(aes(x = date, y=count, colour=shape)) + 
-      geom_line(size=2) + 
-      scale_colour_manual(values = col_pal) + 
-      theme_minimal() + 
-      guides(colour=FALSE) + 
-      labs(title="Number of Reports in Defined Area By Year", x="Years", y="Frequency")
-  
+      summarise(count = n()) %>%
+      ggplot(aes(x = date, y=count, colour=shape)) +
+      geom_line(size=0.7) +
+      scale_colour_manual(values = col_pal) +
+      theme_minimal() +
+      guides(colour=FALSE)
+    
+    # build a plot out of the two with aligned x-axis, no legend
+    subplot(p2, p1, nrows = 2, shareX = TRUE) %>% layout(showlegend = FALSE)
   })
+  
   
 
 }
