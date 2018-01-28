@@ -87,11 +87,24 @@ server <- function(input, output) {
   
   output$sightings <- renderPlotly({
     
-    # plot of proportion of shapes seen by year
+    # handle errors
     if(is.null(input$shape)) {
       return(NULL)
     }
     
+    if(input$until==input$from) {
+      return(NULL)
+    }
+    
+    if(input$longitude[1]==input$longitude[2]) {
+       return(NULL)
+     }
+     
+     if(input$latitude[1]==input$latitude[2]) {
+      return(NULL)
+     }
+    
+    # plot proportion of shapes
     p1 <- sightings() %>%
       mutate(date=year(date)) %>%
       group_by(date, shape) %>%
