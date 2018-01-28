@@ -2,18 +2,23 @@ library(shiny)
 library(leaflet)
 library(tidyverse)
 library(plotly)
-library(shinythemes)
 
-ui <- fluidPage(theme = shinytheme("cosmo"),
+ui <- fluidPage(
   
   sidebarLayout(
     
     # sidebar -------------------------------------------------------------
     sidebarPanel(
       
-      titlePanel("Canadian UFO Sightings"),
+      HTML(
+        paste(h1("Canadian UFO Sightings"),
+              '<br/>',
+              h5("A map of UFO Sightings in Canada that were reported between "),
+              h5("Sept. 15, 1936 and May 6, 2014."), 
+              '<br/>')
+      ),
       
-      "Mapping reported UFO Sightings from Sept. 15, 1936 to May 6, 2014.",
+      #"Mapping reported UFO Sightings from Sept. 15, 1936 to May 6, 2014.",
       
       sliderInput("latitude", "Latitude", min = 40, max = 80, value = c(40, 80)),
       

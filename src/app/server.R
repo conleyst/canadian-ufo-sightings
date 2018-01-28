@@ -28,6 +28,7 @@ server <- function(input, output) {
   
   # create the reactive long/lat box that will update based on sliders
   sightings <- reactive({
+    
     ufo %>% 
       filter(
         shape %in% input$shape,
@@ -38,6 +39,7 @@ server <- function(input, output) {
         longitude >= input$longitude[1],
         longitude <= input$longitude[2]
       )
+    
     
   })
   
@@ -86,6 +88,10 @@ server <- function(input, output) {
   output$sightings <- renderPlotly({
     
     # plot of proportion of shapes seen by year
+    if(is.null(input$shape)) {
+      return(NULL)
+    }
+    
     p1 <- sightings() %>%
       mutate(date=year(date)) %>%
       group_by(date, shape) %>%
